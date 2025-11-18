@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Content Analysis Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+  --color-white: rgba(255, 255, 255, 1);
+  --color-black: rgba(0, 0, 0, 1);
+  --color-cream-50: rgba(252, 252, 249, 1);
+  --color-cream-100: rgba(255, 255, 253, 1);
+  --color-gray-200: rgba(245, 245, 245, 1);
+  --color-gray-300: rgba(167, 169, 169, 1);
+  --color-gray-400: rgba(119, 124, 124, 1);
+  --color-slate-500: rgba(98, 108, 113, 1);
+  --color-brown-600: rgba(94, 82, 64, 1);
+  --color-charcoal-700: rgba(31, 33, 33, 1);
+  --color-charcoal-800: rgba(38, 40, 40, 1);
+  --color-slate-900: rgba(19, 52, 59, 1);
+  --color-teal-300: rgba(50, 184, 198, 1);
+  --color-teal-400: rgba(45, 166, 178, 1);
+  --color-teal-500: rgba(33, 128, 141, 1);
+  --color-teal-600: rgba(29, 116, 128, 1);
+  --color-teal-700: rgba(26, 104, 115, 1);
+  --color-teal-800: rgba(41, 150, 161, 1);
+  --color-red-400: rgba(255, 84, 89, 1);
+  --color-red-500: rgba(192, 21, 47, 1);
+  --color-orange-400: rgba(230, 129, 97, 1);
+  --color-orange-500: rgba(168, 75, 47, 1);
+  --color-brown-600-rgb: 94, 82, 64;
+  --color-teal-500-rgb: 33, 128, 141;
+  --color-slate-900-rgb: 19, 52, 59;
+  --color-slate-500-rgb: 98, 108, 113;
+  --color-red-500-rgb: 192, 21, 47;
+  --color-red-400-rgb: 255, 84, 89;
+  --color-orange-500-rgb: 168, 75, 47;
+  --color-orange-400-rgb: 230, 129, 97;
+  --color-bg-1: rgba(59, 130, 246, 0.08);
+  --color-bg-2: rgba(245, 158, 11, 0.08);
+  --color-bg-3: rgba(34, 197, 94, 0.08);
+  --color-bg-4: rgba(239, 68, 68, 0.08);
+  --color-bg-5: rgba(147, 51, 234, 0.08);
+  --color-bg-6: rgba(249, 115, 22, 0.08);
+  --color-bg-7: rgba(236, 72, 153, 0.08);
+  --color-bg-8: rgba(6, 182, 212, 0.08);
+  --color-background: var(--color-cream-50);
+  --color-surface: var(--color-cream-100);
+  --color-text: var(--color-slate-900);
+  --color-text-secondary: var(--color-slate-500);
+  --color-primary: var(--color-teal-500);
+  --color-primary-hover: var(--color-teal-600);
+  --color-primary-active: var(--color-teal-700);
+  --color-secondary: rgba(var(--color-brown-600-rgb), 0.12);
+  --color-secondary-hover: rgba(var(--color-brown-600-rgb), 0.2);
+  --color-secondary-active: rgba(var(--color-brown-600-rgb), 0.25);
+  --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+  --color-btn-primary-text: var(--color-cream-50);
+  --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+  --color-card-border-inner: rgba(var(--color-brown-600-rgb), 0.12);
+  --color-error: var(--color-red-500);
+  --color-success: var(--color-teal-500);
+  --color-warning: var(--color-orange-500);
+  --color-info: var(--color-slate-500);
+  --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.4);
+  --color-select-caret: rgba(var(--color-slate-900-rgb), 0.8);
+  --focus-ring: 0 0 0 3px var(--color-focus-ring);
+  --focus-outline: 2px solid var(--color-primary);
+  --status-bg-opacity: 0.15;
+  --status-border-opacity: 0.25;
+  --select-caret-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23134252' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  --select-caret-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23f5f5f5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  --color-success-rgb: 33, 128, 141;
+  --color-error-rgb: 192, 21, 47;
+  --color-warning-rgb: 168, 75, 47;
+  --color-info-rgb: 98, 108, 113;
+  --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family-mono: "Berkeley Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+  --font-size-4xl: 30px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 550;
+  --font-weight-bold: 600;
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --letter-spacing-tight: -0.01em;
+  --space-0: 0;
+  --space-1: 1px;
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-6: 6px;
+  --space-8: 8px;
+  --space-10: 10px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --radius-sm: 6px;
+  --radius-base: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  --shadow-inset-sm: inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-gray-400-rgb: 119, 124, 124;
+    --color-teal-300-rgb: 50, 184, 198;
+    --color-gray-300-rgb: 167, 169, 169;
+    --color-gray-200-rgb: 245, 245, 245;
+    --color-bg-1: rgba(29, 78, 216, 0.15);
+    --color-bg-2: rgba(180, 83, 9, 0.15);
+    --color-bg-3: rgba(21, 128, 61, 0.15);
+    --color-bg-4: rgba(185, 28, 28, 0.15);
+    --color-bg-5: rgba(107, 33, 168, 0.15);
+    --color-bg-6: rgba(194, 65, 12, 0.15);
+    --color-bg-7: rgba(190, 24, 93, 0.15);
+    --color-bg-8: rgba(8, 145, 178, 0.15);
+    --color-background: var(--color-charcoal-700);
+    --color-surface: var(--color-charcoal-800);
+    --color-text: var(--color-gray-200);
+    --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
+    --color-primary: var(--color-teal-300);
+    --color-primary-hover: var(--color-teal-400);
+    --color-primary-active: var(--color-teal-800);
+    --color-secondary: rgba(var(--color-gray-400-rgb), 0.15);
+    --color-secondary-hover: rgba(var(--color-gray-400-rgb), 0.25);
+    --color-secondary-active: rgba(var(--color-gray-400-rgb), 0.3);
+    --color-border: rgba(var(--color-gray-400-rgb), 0.3);
+    --color-error: var(--color-red-400);
+    --color-success: var(--color-teal-300);
+    --color-warning: var(--color-orange-400);
+    --color-info: var(--color-gray-300);
+    --color-focus-ring: rgba(var(--color-teal-300-rgb), 0.4);
+    --color-btn-primary-text: var(--color-slate-900);
+    --color-card-border: rgba(var(--color-gray-400-rgb), 0.2);
+    --color-card-border-inner: rgba(var(--color-gray-400-rgb), 0.15);
+    --shadow-inset-sm: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+    --button-border-secondary: rgba(var(--color-gray-400-rgb), 0.2);
+    --color-border-secondary: rgba(var(--color-gray-400-rgb), 0.2);
+    --color-select-caret: rgba(var(--color-gray-200-rgb), 0.8);
+    --color-success-rgb: var(--color-teal-300-rgb);
+    --color-error-rgb: var(--color-red-400-rgb);
+    --color-warning-rgb: var(--color-orange-400-rgb);
+    --color-info-rgb: var(--color-gray-300-rgb);
+  }
+}
+
+@font-face {
+  font-family: 'FKGroteskNeue';
+  src: url('https://r2cdn.perplexity.ai/fonts/FKGroteskNeue.woff2') format('woff2');
+}
+
+html {
+  font-size: var(--font-size-base);
+  font-family: var(--font-family-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  background-color: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* Custom styles for Netflix Dashboard */
+.dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--space-24);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--space-32);
+  padding: var(--space-24);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-card-border);
+}
+
+.netflix-logo {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-error);
+  margin-bottom: var(--space-8);
+  letter-spacing: -0.02em;
+}
+
+.dashboard-title {
+  font-size: var(--font-size-2xl);
+  color: var(--color-text);
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-16);
+  margin-bottom: var(--space-32);
+}
+
+.metric-card {
+  background: var(--color-surface);
+  padding: var(--space-24);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-card-border);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.metric-card.bg-1 { background: var(--color-bg-1); }
+.metric-card.bg-2 { background: var(--color-bg-2); }
+.metric-card.bg-3 { background: var(--color-bg-3); }
+.metric-card.bg-4 { background: var(--color-bg-4); }
+.metric-card.bg-5 { background: var(--color-bg-5); }
+.metric-card.bg-6 { background: var(--color-bg-6); }
+
+.metric-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-8);
+  font-weight: var(--font-weight-medium);
+}
+
+.metric-value {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  margin-bottom: var(--space-4);
+}
+
+.metric-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-8);
+  margin-bottom: var(--space-24);
+  border-bottom: 2px solid var(--color-border);
+  overflow-x: auto;
+  padding-bottom: var(--space-8);
+}
+
+.tab-button {
+  padding: var(--space-12) var(--space-20);
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all var(--duration-fast) var(--ease-standard);
+  white-space: nowrap;
+}
+
+.tab-button:hover {
+  color: var(--color-text);
+  background: var(--color-secondary);
+  border-radius: var(--radius-base) var(--radius-base) 0 0;
+}
+
+.tab-button.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.tab-content {
+  display: none;
+  animation: fadeIn var(--duration-normal) var(--ease-standard);
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.content-section {
+  background: var(--color-surface);
+  padding: var(--space-24);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-card-border);
+  margin-bottom: var(--space-24);
+}
+
+.section-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-16);
+  color: var(--color-text);
+}
+
+.chart-container {
+  position: relative;
+  height: 400px;
+  margin-bottom: var(--space-24);
+}
+
+.insights-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.insights-list li {
+  padding: var(--space-12);
+  margin-bottom: var(--space-8);
+  background: var(--color-secondary);
+  border-radius: var(--radius-base);
+  border-left: 4px solid var(--color-primary);
+  color: var(--color-text);
+}
+
+.top-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.top-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-12);
+  margin-bottom: var(--space-8);
+  background: var(--color-secondary);
+  border-radius: var(--radius-base);
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.top-list li:hover {
+  background: var(--color-secondary-hover);
+}
+
+.list-name {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.list-value {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+}
+
+.footer {
+  text-align: center;
+  padding: var(--space-24);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-32);
+}
+
+.two-column-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: var(--space-24);
+  margin-bottom: var(--space-24);
+}
+
+@media (max-width: 768px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .two-column-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tabs {
+    flex-wrap: wrap;
+  }
+  
+  .chart-container {
+    height: 300px;
+  }
+}
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <div class="header">
+            <div class="netflix-logo">NETFLIX</div>
+            <h1 class="dashboard-title">Content Analysis Dashboard</h1>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="metrics-grid" id="metricsGrid">
+            <div class="metric-card bg-1">
+                <div class="metric-label">Total Content</div>
+                <div class="metric-value">8,790</div>
+                <div class="metric-subtitle">Titles in catalog</div>
+            </div>
+            <div class="metric-card bg-2">
+                <div class="metric-label">Movies</div>
+                <div class="metric-value">6,126</div>
+                <div class="metric-subtitle">69.7% of content</div>
+            </div>
+            <div class="metric-card bg-3">
+                <div class="metric-label">TV Shows</div>
+                <div class="metric-value">2,664</div>
+                <div class="metric-subtitle">30.3% of content</div>
+            </div>
+            <div class="metric-card bg-4">
+                <div class="metric-label">Countries</div>
+                <div class="metric-value">86</div>
+                <div class="metric-subtitle">Global reach</div>
+            </div>
+            <div class="metric-card bg-5">
+                <div class="metric-label">Avg Movie Duration</div>
+                <div class="metric-value">99.6</div>
+                <div class="metric-subtitle">Minutes per movie</div>
+            </div>
+            <div class="metric-card bg-6">
+                <div class="metric-label">Avg TV Seasons</div>
+                <div class="metric-value">1.75</div>
+                <div class="metric-subtitle">Seasons per show</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('overview')">Overview</button>
+            <button class="tab-button" onclick="switchTab('content')">Content Type Distribution</button>
+            <button class="tab-button" onclick="switchTab('genre')">Genre Analysis</button>
+            <button class="tab-button" onclick="switchTab('geographic')">Geographic Distribution</button>
+            <button class="tab-button" onclick="switchTab('growth')">Growth Trends</button>
+            <button class="tab-button" onclick="switchTab('ratings')">Ratings Analysis</button>
+        </div>
+
+        <!-- Tab Contents -->
+        <div id="overview" class="tab-content active">
+            <div class="two-column-grid">
+                <div class="content-section">
+                    <h2 class="section-title">Top 5 Countries</h2>
+                    <ul class="top-list">
+                        <li><span class="list-name">United States</span> <span class="list-value">3,240 (36.9%)</span></li>
+                        <li><span class="list-name">India</span> <span class="list-value">1,057 (12.0%)</span></li>
+                        <li><span class="list-name">United Kingdom</span> <span class="list-value">638 (7.3%)</span></li>
+                        <li><span class="list-name">Pakistan</span> <span class="list-value">421 (4.8%)</span></li>
+                        <li><span class="list-name">Canada</span> <span class="list-value">271 (3.1%)</span></li>
+                    </ul>
+                </div>
+                <div class="content-section">
+                    <h2 class="section-title">Top 5 Ratings</h2>
+                    <ul class="top-list">
+                        <li><span class="list-name">TV-MA</span> <span class="list-value">3,205 (36.5%)</span></li>
+                        <li><span class="list-name">TV-14</span> <span class="list-value">2,157 (24.5%)</span></li>
+                        <li><span class="list-name">TV-PG</span> <span class="list-value">861 (9.8%)</span></li>
+                        <li><span class="list-name">R</span> <span class="list-value">799 (9.1%)</span></li>
+                        <li><span class="list-name">PG-13</span> <span class="list-value">490 (5.6%)</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="content-section">
+                <h2 class="section-title">Key Insights</h2>
+                <ul class="insights-list">
+                    <li>Netflix catalog contains 8,790 titles spanning 86 countries</li>
+                    <li>Movies dominate at 69.7% of content, providing diverse film selections</li>
+                    <li>Peak expansion in 2019 with 2,016 titles added</li>
+                    <li>International content highly prioritized with 2,752 international movie titles</li>
+                    <li>USA is top producer with 36.9% of all content</li>
+                    <li>India emerges as second largest with 12% representation</li>
+                    <li>67.2% of TV shows are single-season productions</li>
+                    <li>TV-MA rating dominates with 36.5% of catalog</li>
+                    <li>Strong emphasis on adult and young adult audiences</li>
+                    <li>Diverse genre portfolio appeals to wide range of viewers</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="content" class="tab-content">
+            <div class="content-section">
+                <h2 class="section-title">Content Type Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="contentTypeChart"></canvas>
+                </div>
+            </div>
+            <div class="content-section">
+                <h2 class="section-title">Top 5 Countries by Content Type</h2>
+                <div class="chart-container">
+                    <canvas id="countryTypeChart"></canvas>
+                </div>
+            </div>
+            <div class="content-section">
+                <h2 class="section-title">Content Characteristics</h2>
+                <ul class="insights-list">
+                    <li>Movies represent nearly 70% of the entire Netflix catalog, showcasing a strong film library</li>
+                    <li>TV Shows make up 30% with an average of 1.75 seasons, indicating focus on limited series</li>
+                    <li>Average movie duration is 99.6 minutes, providing standard feature-length entertainment</li>
+                    <li>Both content types are distributed globally across 86 countries</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="genre" class="tab-content">
+            <div class="content-section">
+                <h2 class="section-title">Top 20 Genres by Popularity</h2>
+                <div class="chart-container" style="height: 600px;">
+                    <canvas id="genreChart"></canvas>
+                </div>
+            </div>
+            <div class="content-section">
+                <h2 class="section-title">Genre Insights</h2>
+                <ul class="insights-list">
+                    <li>International Movies lead with 2,752 titles, highlighting Netflix's global content strategy</li>
+                    <li>Dramas are the second most popular genre with 2,426 titles</li>
+                    <li>Comedies rank third with 1,674 titles, appealing to broad audiences</li>
+                    <li>International TV Shows represent 1,349 titles, showing strong global TV content</li>
+                    <li>Documentaries have 869 titles, demonstrating Netflix's investment in non-fiction</li>
+                    <li>Genre diversity ensures content for every viewer preference</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="geographic" class="tab-content">
+            <div class="content-section">
+                <h2 class="section-title">Top 15 Countries by Content Count</h2>
+                <div class="chart-container" style="height: 500px;">
+                    <canvas id="geographicChart"></canvas>
+                </div>
+            </div>
+            <div class="content-section">
+                <h2 class="section-title">Geographic Insights</h2>
+                <ul class="insights-list">
+                    <li>United States dominates with 3,240 titles (36.9% of total content)</li>
+                    <li>India is second with 1,057 titles (12.0%), showing strong South Asian presence</li>
+                    <li>United Kingdom contributes 638 titles (7.3%), third largest producer</li>
+                    <li>Asian countries like Pakistan (421), Japan (259), and South Korea (214) feature prominently</li>
+                    <li>European nations including France (213), Spain (182), and Turkey (112) contribute significantly</li>
+                    <li>Content spans 86 countries total, showcasing Netflix's truly global catalog</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="growth" class="tab-content">
+            <div class="content-section">
+                <h2 class="section-title">Content Additions by Year (2008-2021)</h2>
+                <div class="chart-container">
+                    <canvas id="growthChart"></canvas>
+                </div>
+            </div>
+            <div class="content-section">
+                <h2 class="section-title">Growth Insights</h2>
+                <ul class="insights-list">
+                    <li>2019 marked the peak year with 2,016 titles added to the platform</li>
+                    <li>Exponential growth from 2015 (82 titles) to 2019 (2,016 titles) - a 2,360% increase</li>
+                    <li>2018 saw 1,648 additions, showing strong momentum leading to 2019 peak</li>
+                    <li>2020 added 1,879 titles despite pandemic challenges</li>
+                    <li>2021 maintained strong output with 1,498 titles added</li>
+                    <li>Early years (2008-2014) showed minimal additions as Netflix built its streaming foundation</li>
+                    <li>The 2016-2019 period represents Netflix's most aggressive content expansion phase</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="ratings" class="tab-content">
+            <div class="content-section">
+                <h2 class="section-title">Content Ratings Distribution</h2>
+                <div class="chart-container" style="height: 500px;">
+                    <canvas id="ratingsChart"></canvas>
+                </div>
+            </div>
+            <div class="content-section">
+                <h2 class="section-title">Ratings Insights</h2>
+                <ul class="insights-list">
+                    <li>TV-MA (Mature Audiences) dominates with 3,205 titles (36.5%), indicating adult-focused content</li>
+                    <li>TV-14 is second with 2,157 titles (24.5%), targeting teenage and adult viewers</li>
+                    <li>Combined, TV-MA and TV-14 represent 61% of all content</li>
+                    <li>Family-friendly ratings (TV-PG, PG-13, PG, TV-Y, TV-Y7) comprise approximately 24% of catalog</li>
+                    <li>R-rated content accounts for 799 titles (9.1%), showing significant theatrical film presence</li>
+                    <li>Children's content (TV-Y: 306, TV-Y7: 333) totals 639 titles</li>
+                    <li>Rating distribution shows Netflix balances adult entertainment with family content</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Netflix Content Analysis Dashboard | Data as of November 2025</p>
+            <p>Comprehensive analysis of 8,790 titles across 86 countries</p>
+        </div>
+    </div>
+
+    <script>
+        // Chart colors
+        const chartColors = ['#1FB8CD', '#FFC185', '#B4413C', '#ECEBD5', '#5D878F', '#DB4545', '#D2BA4C', '#964325', '#944454', '#13343B'];
+
+        // Tab switching function
+        function switchTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            // Initialize charts if not already done
+            if (tabName === 'content' && !window.contentChartsInitialized) {
+                initContentCharts();
+                window.contentChartsInitialized = true;
+            } else if (tabName === 'genre' && !window.genreChartInitialized) {
+                initGenreChart();
+                window.genreChartInitialized = true;
+            } else if (tabName === 'geographic' && !window.geoChartInitialized) {
+                initGeographicChart();
+                window.geoChartInitialized = true;
+            } else if (tabName === 'growth' && !window.growthChartInitialized) {
+                initGrowthChart();
+                window.growthChartInitialized = true;
+            } else if (tabName === 'ratings' && !window.ratingsChartInitialized) {
+                initRatingsChart();
+                window.ratingsChartInitialized = true;
+            }
+        }
+
+        // Initialize Content Type Charts
+        function initContentCharts() {
+            // Pie Chart
+            const ctx1 = document.getElementById('contentTypeChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'pie',
+                data: {
+                    labels: ['Movies', 'TV Shows'],
+                    datasets: [{
+                        data: [6126, 2664],
+                        backgroundColor: [chartColors[0], chartColors[1]],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: { size: 14 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const percentage = ((value / 8790) * 100).toFixed(1);
+                                    return label + ': ' + value + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Bar Chart for Countries
+            const ctx2 = document.getElementById('countryTypeChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['USA', 'India', 'UK', 'Pakistan', 'Canada'],
+                    datasets: [
+                        {
+                            label: 'Total Content',
+                            data: [3240, 1057, 638, 421, 271],
+                            backgroundColor: chartColors[0],
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Titles'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize Genre Chart
+        function initGenreChart() {
+            const ctx = document.getElementById('genreChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['International Movies', 'Dramas', 'Comedies', 'International TV', 'Documentaries', 
+                             'Action & Adventure', 'TV Dramas', 'Independent Movies', 'Children & Family', 'Romantic Movies',
+                             'Thrillers', 'TV Comedies', 'Crime TV Shows', 'Kids\' TV', 'Docuseries',
+                             'Music & Musicals', 'Romantic TV', 'Horror Movies', 'Stand-Up Comedy', 'Reality TV'],
+                    datasets: [{
+                        label: 'Number of Titles',
+                        data: [2752, 2426, 1674, 1349, 869, 859, 762, 756, 641, 616, 577, 573, 469, 448, 394, 375, 370, 357, 343, 255],
+                        backgroundColor: chartColors,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Titles'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize Geographic Chart
+        function initGeographicChart() {
+            const ctx = document.getElementById('geographicChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['USA', 'India', 'UK', 'Pakistan', 'Canada', 'Japan', 'South Korea', 'France', 
+                             'Spain', 'Mexico', 'Egypt', 'Australia', 'Turkey', 'Nigeria', 'Not Given'],
+                    datasets: [{
+                        label: 'Content Count',
+                        data: [3240, 1057, 638, 421, 271, 259, 214, 213, 182, 138, 123, 114, 112, 105, 287],
+                        backgroundColor: chartColors,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Titles'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize Growth Chart
+        function initGrowthChart() {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021'],
+                    datasets: [{
+                        label: 'Titles Added',
+                        data: [2, 2, 1, 13, 3, 11, 24, 82, 426, 1185, 1648, 2016, 1879, 1498],
+                        borderColor: chartColors[0],
+                        backgroundColor: chartColors[0] + '33',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Titles Added'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Year'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize Ratings Chart
+        function initRatingsChart() {
+            const ctx = document.getElementById('ratingsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['TV-MA', 'TV-14', 'TV-PG', 'R', 'PG-13', 'TV-Y7', 'TV-Y', 'PG', 'TV-G', 'NR', 'G', 'TV-Y7-FV', 'NC-17', 'UR'],
+                    datasets: [{
+                        label: 'Number of Titles',
+                        data: [3205, 2157, 861, 799, 490, 333, 306, 287, 220, 79, 41, 6, 3, 3],
+                        backgroundColor: chartColors,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Titles'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
